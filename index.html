@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radhika IT College | Management System & Portal</title>
+    <meta name="description" content="Welcome to Radhika IT College. Explore our professional IT courses, DCA, PGDCA, ADCA, O-Level, and manage college operations seamlessly.">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Site Header -->
+    <header class="site-header">
+        <div class="logo-container">
+            <div class="logo-icon">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div class="logo-text">
+                <h1>RADHIKA IT</h1>
+                <p>COLLEGE OF TECHNOLOGY</p>
+            </div>
+        </div>
+
+        <nav class="site-nav">
+            <a href="#home" class="nav-link active">Home</a>
+            <a href="#about" class="nav-link">About</a>
+            <a href="#courses" class="nav-link">Courses</a>
+            <a href="#admissions" class="nav-link">Admissions</a>
+            <a href="#contact" class="nav-link">Contact Us</a>
+            <button class="theme-btn" id="theme-toggle" title="Toggle Theme">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <a href="login.html" class="btn-primary"><i class="fa-solid fa-lock-open mr-2"></i> Portal Login</a>
+        </nav>
+
+        <!-- Mobile Menu Toggle -->
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="theme-btn" id="mobile-theme-toggle" style="display: none;" title="Toggle Theme">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <a href="login.html" class="btn-primary" id="mobile-login-btn" style="display: none; padding: 6px 12px; font-size: 0.85rem;">Login</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="home">
+        <div class="hero-content">
+            <h2>Empower Your Future with <span>Practical IT Skills</span></h2>
+            <p>Radhika IT College is a premier technical institute offering Government recognized diplomas and certifications. Learn coding, system design, database management, and office automation under expert guidance.</p>
+            <div class="hero-cta">
+                <a href="#admissions" class="btn-primary">Apply Now</a>
+                <a href="#courses" class="btn-secondary">Explore Courses</a>
+            </div>
+        </div>
+        <div class="hero-illustration">
+            <!-- Professional SVG Illustration -->
+            <svg viewBox="0 0 500 400" width="100%" height="100%">
+                <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                <circle cx="250" cy="200" r="160" fill="url(#grad1)" opacity="0.05"/>
+                <!-- Server/Desk representation -->
+                <rect x="100" y="320" width="300" height="20" rx="10" fill="#2563eb" opacity="0.8"/>
+                <rect x="150" y="340" width="200" height="30" fill="#1e3a8a"/>
+                <!-- Main screen -->
+                <rect x="120" y="100" width="260" height="200" rx="15" fill="#1e293b" stroke="#e2e8f0" stroke-width="4"/>
+                <rect x="130" y="110" width="240" height="150" rx="8" fill="#0f172a"/>
+                <!-- Keyboard -->
+                <rect x="180" y="310" width="140" height="8" rx="4" fill="#64748b"/>
+                <!-- Code mock lines -->
+                <rect x="150" y="130" width="60" height="8" rx="4" fill="#3b82f6"/>
+                <rect x="150" y="150" width="110" height="8" rx="4" fill="#10b981"/>
+                <rect x="170" y="170" width="90" height="8" rx="4" fill="#f59e0b"/>
+                <rect x="150" y="190" width="40" height="8" rx="4" fill="#ef4444"/>
+                <rect x="200" y="190" width="80" height="8" rx="4" fill="#3b82f6"/>
+                <!-- Floating Graduation Cap -->
+                <path d="M250,50 L310,75 L250,100 L190,75 Z" fill="#2563eb"/>
+                <path d="M210,83.5 L210,110 C210,120 290,120 290,110 L290,83.5" fill="#1d4ed8"/>
+                <path d="M310,75 L310,115 C310,115 305,120 300,115" fill="#f59e0b" stroke="#f59e0b" stroke-width="2"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- Statistics Ribbon -->
+    <section class="stats-ribbon">
+        <div class="stat-item">
+            <div class="stat-num" id="stat-centers">3+</div>
+            <div class="stat-label">Learning Centers</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num" id="stat-students">1,200+</div>
+            <div class="stat-label">Students Placed</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num" id="stat-courses">8+</div>
+            <div class="stat-label">IT Courses</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num" id="stat-ratio">98%</div>
+            <div class="stat-label">Pass Ratio</div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section" id="about">
+        <div class="section-title">
+            <h3>About Our College</h3>
+            <p>Empowering rural and urban students with specialized computer training since 2012.</p>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;">
+            <div>
+                <h4 style="font-size: 1.5rem; margin-bottom: 15px; color: var(--primary);">Developing Digital Professionals</h4>
+                <p style="line-height: 1.6; color: var(--text-secondary); margin-bottom: 15px;">
+                    Radhika IT College is dedicated to delivering high-value IT education to students from all walks of life. With state-of-the-art computer labs, high-speed internet connectivity, and well-structured, industry-ready syllabi, we bridge the gap between academic theory and actual workplace demands.
+                </p>
+                <p style="line-height: 1.6; color: var(--text-secondary);">
+                    Our multiple learning centers work in perfect coordination to support online lectures, practical code tasks, certification exams, and campus placements.
+                </p>
+            </div>
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 30px; box-shadow: var(--card-shadow);">
+                <h4 style="font-size: 1.25rem; margin-bottom: 20px; color: var(--primary);">Why Choose Radhika IT?</h4>
+                <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px;">
+                    <li style="display: flex; gap: 12px; align-items: center;"><i class="fa-solid fa-circle-check" style="color: var(--success);"></i> Government Registered Curriculum</li>
+                    <li style="display: flex; gap: 12px; align-items: center;"><i class="fa-solid fa-circle-check" style="color: var(--success);"></i> Live Hands-on Labs & Projects</li>
+                    <li style="display: flex; gap: 12px; align-items: center;"><i class="fa-solid fa-circle-check" style="color: var(--success);"></i> Dedicated Job Placement Cell</li>
+                    <li style="display: flex; gap: 12px; align-items: center;"><i class="fa-solid fa-circle-check" style="color: var(--success);"></i> Multiple Centers for Commuting Comfort</li>
+                    <li style="display: flex; gap: 12px; align-items: center;"><i class="fa-solid fa-circle-check" style="color: var(--success);"></i> Budget-Friendly Fees with Installments</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Courses Section -->
+    <section class="section" id="courses" style="background: var(--bg-primary);">
+        <div class="section-title">
+            <h3>Featured Professional Programs</h3>
+            <p>Select the course that aligns with your professional aspirations.</p>
+        </div>
+        <div class="courses-grid">
+            <!-- Course 1 -->
+            <div class="course-card">
+                <div class="course-icon"><i class="fa-solid fa-file-code"></i></div>
+                <h4>ADCA</h4>
+                <p>Advanced Diploma in Computer Applications. Complete 1-year course covering programming, web design, and financial accounts.</p>
+                <div class="course-meta">
+                    <span><i class="fa-regular fa-clock"></i> 12 Months</span>
+                    <span>Fees: ₹15,000</span>
+                </div>
+            </div>
+            <!-- Course 2 -->
+            <div class="course-card">
+                <div class="course-icon"><i class="fa-solid fa-display"></i></div>
+                <h4>DCA</h4>
+                <p>Diploma in Computer Applications. Core 6-month course covering MS Office, database design, operating systems, and web basics.</p>
+                <div class="course-meta">
+                    <span><i class="fa-regular fa-clock"></i> 6 Months</span>
+                    <span>Fees: ₹8,000</span>
+                </div>
+            </div>
+            <!-- Course 3 -->
+            <div class="course-card">
+                <div class="course-icon"><i class="fa-solid fa-network-wired"></i></div>
+                <h4>PGDCA</h4>
+                <p>Post Graduate Diploma in Computer Applications. 1-year master-level diploma covering software engineering and DBMS.</p>
+                <div class="course-meta">
+                    <span><i class="fa-regular fa-clock"></i> 12 Months</span>
+                    <span>Fees: ₹18,000</span>
+                </div>
+            </div>
+            <!-- Course 4 -->
+            <div class="course-card">
+                <div class="course-icon"><i class="fa-solid fa-microchip"></i></div>
+                <h4>O-Level</h4>
+                <p>NIELIT foundation course. Focuses on Python programming, Web design, IoT, and ICT resources development.</p>
+                <div class="course-meta">
+                    <span><i class="fa-regular fa-clock"></i> 12 Months</span>
+                    <span>Fees: ₹12,000</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admissions Enquiry Section -->
+    <section class="section" id="admissions">
+        <div class="section-title">
+            <h3>Online Admission Inquiry</h3>
+            <p>Fill out the registration form below, and our admissions team will contact you shortly.</p>
+        </div>
+        <div class="contact-container">
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+                <h4 style="font-size: 1.5rem; margin-bottom: 20px;">Admission Steps</h4>
+                <div class="contact-info-list">
+                    <div class="contact-info-item">
+                        <div class="contact-info-icon">1</div>
+                        <div class="contact-info-text">
+                            <h5>Submit Inquiry</h5>
+                            <p>Register online by filling the details. Specify your course and preferred learning center.</p>
+                        </div>
+                    </div>
+                    <div class="contact-info-item">
+                        <div class="contact-info-icon">2</div>
+                        <div class="contact-info-text">
+                            <h5>Counselor Consultation</h5>
+                            <p>Our academic counselors will call you to discuss syllabus details and batch timings.</p>
+                        </div>
+                    </div>
+                    <div class="contact-info-item">
+                        <div class="contact-info-icon">3</div>
+                        <div class="contact-info-text">
+                            <h5>Documentation & Fees</h5>
+                            <p>Submit your academic certificates, ID proof, photo, and process your admission fee installments.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="enquiry-form-card">
+                <form id="enquiryForm">
+                    <div class="form-group">
+                        <label for="studentName">Student Full Name</label>
+                        <input type="text" id="studentName" placeholder="Enter full name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fatherName">Father's Name</label>
+                        <input type="text" id="fatherName" placeholder="Enter father's name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobileNo">WhatsApp / Contact Mobile</label>
+                        <input type="tel" id="mobileNo" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="courseSelect">Selected Course</label>
+                        <select id="courseSelect" required>
+                            <option value="">-- Choose Course --</option>
+                            <option value="DCA">DCA (6 Months)</option>
+                            <option value="ADCA">ADCA (1 Year)</option>
+                            <option value="PGDCA">PGDCA (1 Year)</option>
+                            <option value="O-Level">O-Level (1 Year)</option>
+                            <option value="CCC">CCC (3 Months)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="centerSelect">Preferred Center Branch</label>
+                        <select id="centerSelect" required>
+                            <option value="">-- Choose Center Branch --</option>
+                            <!-- Dynamically loaded -->
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%;"><i class="fa-solid fa-paper-plane mr-2"></i> Submit Registration</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Us Section -->
+    <section class="section" id="contact" style="background: var(--bg-primary); border-top: 1px solid var(--border-color);">
+        <div class="section-title">
+            <h3>Get In Touch</h3>
+            <p>Find our addresses and coordinates or send us a query directly.</p>
+        </div>
+        <div class="contact-container">
+            <div>
+                <div class="contact-info-list">
+                    <div class="contact-info-item">
+                        <div class="contact-info-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                        <div class="contact-info-text">
+                            <h5>Main Campus (HQ)</h5>
+                            <p>Civil Lines, Near Town Hall, District HQ Office Complex, Pin - 274001</p>
+                        </div>
+                    </div>
+                    <div class="contact-info-item">
+                        <div class="contact-info-icon"><i class="fa-solid fa-phone"></i></div>
+                        <div class="contact-info-text">
+                            <h5>Admissions Hotline</h5>
+                            <p>+91 98765 43210, +91 87654 32109</p>
+                        </div>
+                    </div>
+                    <div class="contact-info-item">
+                        <div class="contact-info-icon"><i class="fa-solid fa-envelope"></i></div>
+                        <div class="contact-info-text">
+                            <h5>Support Email</h5>
+                            <p>admissions@radhikaitcollege.org, info@radhikaitcollege.org</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Clean SVG Map Placeholder -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); height: 250px; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative;">
+                <svg viewBox="0 0 400 200" width="100%" height="100%">
+                    <rect width="100%" height="100%" fill="var(--bg-primary)" />
+                    <!-- Mock grid lines -->
+                    <line x1="50" y1="0" x2="50" y2="200" stroke="var(--border-color)" stroke-width="1" />
+                    <line x1="150" y1="0" x2="150" y2="200" stroke="var(--border-color)" stroke-width="1" />
+                    <line x1="250" y1="0" x2="250" y2="200" stroke="var(--border-color)" stroke-width="1" />
+                    <line x1="350" y1="0" x2="350" y2="200" stroke="var(--border-color)" stroke-width="1" />
+                    <line x1="0" y1="50" x2="400" y2="50" stroke="var(--border-color)" stroke-width="1" />
+                    <line x1="0" y1="100" x2="400" y2="100" stroke="var(--border-color)" stroke-width="1" />
+                    <line x1="0" y1="150" x2="400" y2="150" stroke="var(--border-color)" stroke-width="1" />
+                    <!-- Roads -->
+                    <path d="M 0 80 Q 200 120 400 80" stroke="#cbd5e1" stroke-width="15" fill="none" opacity="0.6" />
+                    <path d="M 180 0 L 180 200" stroke="#cbd5e1" stroke-width="10" fill="none" opacity="0.6" />
+                    <!-- Pin -->
+                    <circle cx="220" cy="100" r="10" fill="var(--danger)" />
+                    <circle cx="220" cy="100" r="4" fill="white" />
+                    <text x="235" y="105" font-family="'Outfit', sans-serif" font-weight="700" font-size="12" fill="var(--text-primary)">Radhika IT College</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="background: #0f172a; color: #94a3b8; padding: 40px 5% 20px; border-top: 4px solid var(--primary); text-align: center;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; margin-bottom: 30px; text-align: left;">
+            <div>
+                <h4 style="color: white; font-size: 1.25rem; margin-bottom: 10px;">Radhika IT College Management System</h4>
+                <p style="font-size: 0.85rem; max-width: 400px;">Providing state of the art ERP platform for streamlined college office work, multi-branch management, student tracking, and automated fees invoicing.</p>
+            </div>
+            <div style="display: flex; gap: 15px; font-size: 1.5rem; color: white;">
+                <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                <a href="#"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="#"><i class="fa-brands fa-youtube"></i></a>
+            </div>
+        </div>
+        <p style="font-size: 0.8rem; border-top: 1px solid #1e293b; padding-top: 20px;">&copy; 2026 Radhika IT College. All rights reserved. Designed for professional ERP office management operations.</p>
+    </footer>
+
+    <!-- Toast Container for alerts -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="js/db.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

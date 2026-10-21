@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Office Portal Login | Radhika IT College</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-wrapper">
+
+    <div class="login-card">
+        <!-- Logo -->
+        <div class="login-header">
+            <div class="logo-container" style="justify-content: center; margin-bottom: 15px;">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div class="logo-text" style="text-align: left;">
+                    <h1 style="font-size: 1.1rem; color: var(--primary);">RADHIKA IT</h1>
+                    <p style="font-size: 0.7rem; color: var(--text-secondary);">OFFICE ERP SYSTEM</p>
+                </div>
+            </div>
+            <h2>Office Management System</h2>
+            <p>Use the login ID and password assigned by your system administrator.</p>
+        </div>
+
+        <!-- Form -->
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginId">Login ID / Username</label>
+                <div style="position: relative;">
+                    <i class="fa-regular fa-user" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="text" id="loginId" placeholder="Login ID" style="padding-left: 35px; width: 100%;" required autocomplete="username">
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 25px;">
+                <label for="password">Password</label>
+                <div style="position: relative;">
+                    <i class="fa-solid fa-lock" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="password" id="password" placeholder="Password" style="padding-left: 35px; width: 100%;" required autocomplete="current-password">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; padding: 12px; font-size: 1rem;"><i class="fa-solid fa-right-to-bracket mr-2"></i> Sign In to Account</button>
+        </form>
+        
+        <div style="text-align: center; margin-top: 25px;">
+            <a href="index.html" style="font-size: 0.85rem; color: var(--text-secondary);"><i class="fa-solid fa-arrow-left mr-2"></i> Back to Main Website</a>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/db.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Apply theme setting
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+
+            const loginForm = document.getElementById('loginForm');
+            const loginIdInput = document.getElementById('loginId');
+            const passwordInput = document.getElementById('password');
+
+            // Form Submit Login Verification
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = loginIdInput.value.trim();
+                const pwd = passwordInput.value;
+                const submitButton = loginForm.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+
+                try {
+                    const res = await DB.login(username, pwd);
+                    if (res.success) {
+                        showToast(`Welcome back, ${res.user.name}! Redirecting...`, 'success');
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 1000);
+                    } else {
+                        showToast(res.message, 'danger');
+                    }
+                } finally {
+                    submitButton.disabled = false;
+                }
+            });
+
+            // Toast helper
+            function showToast(message, type = 'success') {
+                const container = document.getElementById('toastContainer');
+                if (!container) return;
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                let icon = '<i class="fa-solid fa-circle-check" style="color: var(--success)"></i>';
+                if (type === 'danger') icon = '<i class="fa-solid fa-circle-xmark" style="color: var(--danger)"></i>';
+                if (type === 'warning') icon = '<i class="fa-solid fa-triangle-exclamation" style="color: var(--warning)"></i>';
+                if (type === 'info') icon = '<i class="fa-solid fa-circle-info" style="color: var(--info)"></i>';
+
+                toast.innerHTML = `
+                    ${icon}
+                    <div>
+                        <p style="font-weight: 600; font-size: 0.85rem; margin-bottom: 2px;">${type.toUpperCase()}</p>
+                        <p style="font-size: 0.8rem; color: var(--text-secondary);">${message}</p>
+                    </div>
+                `;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.style.animation = 'slideIn 0.3s reverse forwards';
+                    setTimeout(() => { toast.remove(); }, 300);
+                }, 4000);
+            }
+        });
+    </script>
+</body>
+</html>
