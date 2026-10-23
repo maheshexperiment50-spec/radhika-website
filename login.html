@@ -46,6 +46,40 @@
 
             <button type="submit" class="btn-primary" style="width: 100%; padding: 12px; font-size: 1rem;"><i class="fa-solid fa-right-to-bracket mr-2"></i> Sign In to Account</button>
         </form>
+
+        <div style="text-align: center; margin-top: 16px;">
+            <button type="button" id="showRecovery" class="btn-secondary" style="width: 100%;">Forgot Login ID or Password?</button>
+        </div>
+
+        <section id="recoveryPanel" aria-live="polite" style="display: none; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+            <h3 style="font-size: 1.1rem; margin-bottom: 8px;">Account recovery</h3>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 18px;">Use the email address registered to your staff account.</p>
+            <form id="recoveryRequestForm">
+                <div class="form-group">
+                    <label for="recoveryEmail">Registered email</label>
+                    <input type="email" id="recoveryEmail" required maxlength="254" autocomplete="email" placeholder="name@example.com">
+                </div>
+                <button type="button" id="sendLoginId" class="btn-secondary" style="width: 100%; margin-bottom: 10px;">Email my login ID</button>
+                <button type="button" id="sendResetCode" class="btn-primary" style="width: 100%;">Send password reset code</button>
+            </form>
+
+            <form id="passwordResetForm" style="display: none;">
+                <div class="form-group">
+                    <label for="resetEmail">Registered email</label>
+                    <input type="email" id="resetEmail" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="resetCode">6-digit email code</label>
+                    <input type="text" id="resetCode" required inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code">
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New password (12 characters minimum)</label>
+                    <input type="password" id="newPassword" required minlength="12" maxlength="128" autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn-primary" style="width: 100%;">Reset password</button>
+                <button type="button" id="backToRecovery" class="btn-secondary" style="width: 100%; margin-top: 10px;">Use a different email</button>
+            </form>
+        </section>
         
         <div style="text-align: center; margin-top: 25px;">
             <a href="index.html" style="font-size: 0.85rem; color: var(--text-secondary);"><i class="fa-solid fa-arrow-left mr-2"></i> Back to Main Website</a>
@@ -67,6 +101,87 @@
             const loginForm = document.getElementById('loginForm');
             const loginIdInput = document.getElementById('loginId');
             const passwordInput = document.getElementById('password');
+            const recoveryPanel = document.getElementById('recoveryPanel');
+            const recoveryRequestForm = document.getElementById('recoveryRequestForm');
+            const passwordResetForm = document.getElementById('passwordResetForm');
+            const recoveryEmailInput = document.getElementById('recoveryEmail');
+
+            document.getElementById('showRecovery').addEventListener('click', () => {
+                recoveryPanel.style.display = 'block';
+                document.getElementById('showRecovery').style.display = 'none';
+                recoveryEmailInput.focus();
+            });
+
+            document.getElementById('sendLoginId').addEventListener('click', () => {
+                sendRecoveryRequest('/api/forgot-login-id');
+            });
+
+            document.getElementById('sendResetCode').addEventListener('click', async () => {
+                const result = await sendRecoveryRequest('/api/request-password-reset');
+                if (result) {
+                    document.getElementById('resetEmail').value = recoveryEmailInput.value.trim();
+                    recoveryRequestForm.style.display = 'none';
+                    passwordResetForm.style.display = 'block';
+                    document.getElementById('resetCode').focus();
+                }
+            });
+
+            document.getElementById('backToRecovery').addEventListener('click', () => {
+                passwordResetForm.style.display = 'none';
+                recoveryRequestForm.style.display = 'block';
+            });
+
+            passwordResetForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const submitButton = passwordResetForm.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                try {
+                    const response = await fetch('/api/reset-password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: document.getElementById('resetEmail').value,
+                            code: document.getElementById('resetCode').value,
+                            newPassword: document.getElementById('newPassword').value
+                        })
+                    });
+                    const result = await response.json();
+                    showToast(result.message || 'Password reset failed.', result.success ? 'success' : 'danger');
+                    if (result.success) {
+                        passwordResetForm.reset();
+                        passwordResetForm.style.display = 'none';
+                        recoveryPanel.style.display = 'none';
+                        document.getElementById('showRecovery').style.display = 'block';
+                        loginIdInput.value = '';
+                        passwordInput.value = '';
+                    }
+                } catch (error) {
+                    showToast('Could not contact the server. Please try again.', 'danger');
+                } finally {
+                    submitButton.disabled = false;
+                }
+            });
+
+            async function sendRecoveryRequest(endpoint) {
+                if (!recoveryEmailInput.reportValidity()) return false;
+                const buttons = recoveryRequestForm.querySelectorAll('button');
+                buttons.forEach((button) => { button.disabled = true; });
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: recoveryEmailInput.value.trim() })
+                    });
+                    const result = await response.json();
+                    showToast(result.message || 'Recovery request failed.', result.success ? 'info' : 'danger');
+                    return Boolean(result.success && endpoint === '/api/request-password-reset');
+                } catch (error) {
+                    showToast('Could not contact the server. Please try again.', 'danger');
+                    return false;
+                } finally {
+                    buttons.forEach((button) => { button.disabled = false; });
+                }
+            }
 
             // Form Submit Login Verification
             loginForm.addEventListener('submit', async (e) => {

@@ -10,9 +10,10 @@
   },
   "dependencies": {
     "express": "^4.19.2",
-    "mongodb": "^6.21.0"
+    "mongodb": "^6.21.0",
+    "nodemailer": "^10.2.1"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   }
 }

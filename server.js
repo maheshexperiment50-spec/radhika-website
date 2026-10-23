@@ -1,9 +1,12 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const { MongoClient } = require('mongodb');
+const nodemailer = require('nodemailer');
 
 const app = express();
+app.set('trust proxy', 1);
 app.use(express.json());
 const PORT = process.env.PORT || 3000;
 const rootDir = __dirname;
@@ -18,6 +21,57 @@ let mongoDB = null;
 const localDataDir = path.join(rootDir, 'data');
 const localCollectionsFile = path.join(localDataDir, 'collections.json');
 let useLocalFileStorage = false;
+const recoveryCodes = new Map();
+const recoveryRequests = new Map();
+
+function recoveryRateLimited(req, email) {
+  const now = Date.now();
+  const windows = [
+    { key: `ip:${req.ip}`, limit: 15 },
+    { key: `email:${email}`, limit: 4 }
+  ];
+
+  for (const window of windows) {
+    const recent = (recoveryRequests.get(window.key) || []).filter((time) => now - time < 15 * 60 * 1000);
+    if (recent.length >= window.limit) {
+      recoveryRequests.set(window.key, recent);
+      return true;
+    }
+    recent.push(now);
+    recoveryRequests.set(window.key, recent);
+  }
+
+  return false;
+}
+
+function createMailTransport() {
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!host || !user || !pass || !process.env.SMTP_FROM || !Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error('SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and SMTP_FROM must be configured');
+  }
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: process.env.SMTP_SECURE === 'true' || port === 465,
+    auth: { user, pass }
+  });
+}
+
+function normalizeEmail(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function validEmail(value) {
+  return value.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function recoveryCodeHash(email, code) {
+  return crypto.createHash('sha256').update(`${email}:${code}`).digest();
+}
 
 function readLocalCollections() {
   if (!fs.existsSync(localDataDir)) fs.mkdirSync(localDataDir, { recursive: true });
@@ -507,6 +561,136 @@ app.post('/api/data/:key', async (req, res) => {
   } catch (error) {
     console.error('Error saving collection:', error);
     res.status(500).json({ message: 'Failed to save dataset' });
+  }
+});
+
+app.post('/api/forgot-login-id', async (req, res) => {
+  const email = normalizeEmail(req.body && req.body.email);
+  if (!validEmail(email)) {
+    return res.status(400).json({ success: false, message: 'Enter a valid email address.' });
+  }
+  if (recoveryRateLimited(req, email)) {
+    return res.status(429).json({ success: false, message: 'Too many recovery attempts. Please try again later.' });
+  }
+
+  try {
+    const mailTransport = createMailTransport();
+    const matches = (await getCollection('staff')).filter((member) =>
+      normalizeEmail(member.email) === email && member.login_id
+    );
+    if (matches.length === 1) {
+      await mailTransport.sendMail({
+        from: process.env.SMTP_FROM,
+        to: email,
+        subject: 'Your Radhika IT College login ID',
+        text: `Your login ID is: ${matches[0].login_id}\n\nIf you did not request this email, you can ignore it.`
+      });
+    }
+    return res.json({
+      success: true,
+      message: 'If an account uses that email, its login ID has been sent.'
+    });
+  } catch (error) {
+    console.error('Could not send login ID recovery email:', error.message);
+    return res.status(503).json({ success: false, message: 'Email recovery is unavailable right now. Please contact your system administrator.' });
+  }
+});
+
+app.post('/api/request-password-reset', async (req, res) => {
+  const email = normalizeEmail(req.body && req.body.email);
+  if (!validEmail(email)) {
+    return res.status(400).json({ success: false, message: 'Enter a valid email address.' });
+  }
+  if (recoveryRateLimited(req, email)) {
+    return res.status(429).json({ success: false, message: 'Too many recovery attempts. Please try again later.' });
+  }
+
+  try {
+    const mailTransport = createMailTransport();
+    const matches = (await getCollection('staff')).filter((member) =>
+      normalizeEmail(member.email) === email && member.login_id
+    );
+    if (matches.length === 1) {
+      const code = String(crypto.randomInt(100000, 1000000));
+      await mailTransport.sendMail({
+        from: process.env.SMTP_FROM,
+        to: email,
+        subject: 'Your Radhika IT College password reset code',
+        text: `Your password reset code is ${code}. It expires in 10 minutes. If you did not request this, you can ignore this email.`
+      });
+      recoveryCodes.set(email, {
+        hash: recoveryCodeHash(email, code),
+        expiresAt: Date.now() + 10 * 60 * 1000,
+        attempts: 0
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: 'If an account uses that email, a password reset code has been sent.'
+    });
+  } catch (error) {
+    console.error('Could not send password reset email:', error.message);
+    return res.status(503).json({ success: false, message: 'Email recovery is unavailable right now. Please contact your system administrator.' });
+  }
+});
+
+app.post('/api/reset-password', async (req, res) => {
+  const email = normalizeEmail(req.body && req.body.email);
+  const code = String(req.body && req.body.code || '').trim();
+  const newPassword = String(req.body && req.body.newPassword || '');
+  if (!validEmail(email) || !/^\d{6}$/.test(code) || newPassword.length < 12 || newPassword.length > 128) {
+    return res.status(400).json({
+      success: false,
+      message: 'Enter a valid email, 6-digit code, and a new password of 12 to 128 characters.'
+    });
+  }
+  if (recoveryRateLimited(req, email)) {
+    return res.status(429).json({ success: false, message: 'Too many recovery attempts. Please try again later.' });
+  }
+
+  const pending = recoveryCodes.get(email);
+  if (!pending || pending.expiresAt < Date.now() || pending.attempts >= 5) {
+    recoveryCodes.delete(email);
+    return res.status(400).json({ success: false, message: 'Reset code is invalid or expired. Request a new code.' });
+  }
+
+  const submittedHash = recoveryCodeHash(email, code);
+  if (!crypto.timingSafeEqual(pending.hash, submittedHash)) {
+    pending.attempts += 1;
+    if (pending.attempts >= 5) recoveryCodes.delete(email);
+    return res.status(400).json({ success: false, message: 'Reset code is invalid or expired. Request a new code.' });
+  }
+
+  try {
+    const staff = await getCollection('staff');
+    const matchingIndexes = staff.reduce((indexes, member, index) => {
+      if (normalizeEmail(member.email) === email && member.login_id) indexes.push(index);
+      return indexes;
+    }, []);
+    if (matchingIndexes.length !== 1) {
+      recoveryCodes.delete(email);
+      return res.status(400).json({ success: false, message: 'Account could not be verified. Contact your system administrator.' });
+    }
+
+    staff[matchingIndexes[0]].password = newPassword;
+    if (mongoDB) {
+      await mongoDB.collection('app_data').updateOne(
+        { key: 'staff' },
+        { $set: { key: 'staff', value: staff, updated_at: new Date() } },
+        { upsert: true }
+      );
+    } else {
+      const collections = readLocalCollections();
+      collections.staff = staff;
+      writeLocalCollections(collections);
+    }
+
+    recoveryCodes.delete(email);
+    return res.json({ success: true, message: 'Password reset successfully. Sign in with your new password.' });
+  } catch (error) {
+    console.error('Password reset failed:', error.message);
+    return res.status(500).json({ success: false, message: 'Could not save the new password. Please try again.' });
   }
 });
 
