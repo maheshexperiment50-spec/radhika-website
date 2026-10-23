@@ -1,18 +1,18 @@
 {
   "name": "radhika-it-college-backend",
   "version": "1.0.0",
-  "description": "Backend and SQLite database for the Radhika IT College management website",
+  "description": "Backend and MongoDB database for the Radhika IT College management website",
   "main": "server.js",
   "scripts": {
-    "start": "firebase emulators:start --only hosting,functions,firestore,auth",
-    "dev": "firebase emulators:start --only hosting,functions,firestore,auth",
+    "start": "node server.js",
     "serve": "node server.js",
-    "db:setup": "node scripts/setup-complete-db.js",
-    "migrate:firestore": "node scripts/migrate-sqlite-to-firestore.js"
+    "dev": "node server.js"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "firebase": "^12.19.0",
-    "sqlite3": "^5.1.7"
+    "mongodb": "^6.21.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

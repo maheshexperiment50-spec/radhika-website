@@ -303,6 +303,25 @@
                             <input type="tel" id="studentMobileInput" placeholder="10-digit number" pattern="[0-9]{10}" required>
                         </div>
                     </div>
+                    <!-- Student Course Fees & Concession / Chut -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="studentStandardFeeInput">Standard Fee (₹)</label>
+                            <input type="number" id="studentStandardFeeInput" readonly style="background:var(--bg-primary); cursor:not-allowed;" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="studentDiscountInput">Chut / Discount (₹)</label>
+                            <input type="number" id="studentDiscountInput" placeholder="Discount in ₹" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="studentFeesInput">Final Student Fees (₹)</label>
+                            <input type="number" id="studentFeesInput" placeholder="Agreed Fee" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top:-8px; margin-bottom:15px;">
+                        <label for="studentDiscountReasonInput" style="font-size:0.8rem; color:var(--text-muted);">Discount / Concession Reason (Optional)</label>
+                        <input type="text" id="studentDiscountReasonInput" placeholder="e.g. Merit scholarship, EWS, Referral discount">
+                    </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div class="form-group">
                             <label for="studentCenterInput">Admission Center Branch</label>
@@ -326,7 +345,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary close-modal">Cancel</button>
-                    <button type="submit" class="btn-primary">Confirm Admission</button>
+                    <button type="submit" class="btn-primary" id="btnSubmitStudent">Confirm Admission</button>
                 </div>
             </form>
         </div>
@@ -347,10 +366,30 @@
                             <!-- Populated dynamically -->
                         </select>
                     </div>
+                    <!-- Live Fee Summary Box -->
+                    <div id="feeStudentInfoBox" style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:12px; margin-bottom:15px; display:none;">
+                        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; text-align:center;">
+                            <div>
+                                <span style="font-size:0.75rem; color:var(--text-muted); display:block;">Total Course Fees</span>
+                                <strong id="feeInfoTotal" style="font-size:1.05rem; color:var(--primary);">₹0</strong>
+                            </div>
+                            <div>
+                                <span style="font-size:0.75rem; color:var(--text-muted); display:block;">Already Paid</span>
+                                <strong id="feeInfoPaid" style="font-size:1.05rem; color:var(--success);">₹0</strong>
+                            </div>
+                            <div>
+                                <span style="font-size:0.75rem; color:var(--text-muted); display:block;">Pending Balance</span>
+                                <strong id="feeInfoPending" style="font-size:1.05rem; color:var(--danger);">₹0</strong>
+                            </div>
+                        </div>
+                        <div id="feeMaxNotice" style="margin-top:10px; padding-top:8px; border-top:1px dashed var(--border-color); font-size:0.8rem; color:var(--text-secondary); text-align:center;">
+                            Maximum fee you can collect now: <strong id="feeMaxAmount">₹0</strong>
+                        </div>
+                    </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div class="form-group">
                             <label for="feeAmountInput">Payment Amount (₹)</label>
-                            <input type="number" id="feeAmountInput" placeholder="Amount in INR" min="100" required>
+                            <input type="number" id="feeAmountInput" placeholder="Amount in INR" min="1" required>
                         </div>
                         <div class="form-group">
                             <label for="feeModeInput">Payment Channel</label>
@@ -369,7 +408,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary close-modal">Cancel</button>
-                    <button type="submit" class="btn-primary">Process Fee Payment</button>
+                    <button type="submit" class="btn-primary" id="btnSubmitFee">Process Fee Payment</button>
                 </div>
             </form>
         </div>
