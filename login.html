@@ -217,13 +217,16 @@
                 if (type === 'warning') icon = '<i class="fa-solid fa-triangle-exclamation" style="color: var(--warning)"></i>';
                 if (type === 'info') icon = '<i class="fa-solid fa-circle-info" style="color: var(--info)"></i>';
 
-                toast.innerHTML = `
-                    ${icon}
-                    <div>
-                        <p style="font-weight: 600; font-size: 0.85rem; margin-bottom: 2px;">${type.toUpperCase()}</p>
-                        <p style="font-size: 0.8rem; color: var(--text-secondary);">${message}</p>
-                    </div>
-                `;
+                const content = document.createElement('div');
+                const title = document.createElement('p');
+                title.style.cssText = 'font-weight: 600; font-size: 0.85rem; margin-bottom: 2px;';
+                title.textContent = type.toUpperCase();
+                const body = document.createElement('p');
+                body.style.cssText = 'font-size: 0.8rem; color: var(--text-secondary);';
+                body.textContent = message;
+                content.append(title, body);
+                toast.innerHTML = icon;
+                toast.appendChild(content);
                 container.appendChild(toast);
                 setTimeout(() => {
                     toast.style.animation = 'slideIn 0.3s reverse forwards';

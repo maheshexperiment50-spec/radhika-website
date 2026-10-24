@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -14,7 +16,7 @@ const rootDir = __dirname;
 // -----------------------------------------------------------------------------
 // MONGODB CONNECTION
 // -----------------------------------------------------------------------------
-const MONGODB_URI = process.env.MONGODB_URI || '';
+const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGODB_URL || '';
 const COLLECTION_KEYS = ['centers', 'staff', 'students', 'fees', 'attendance', 'expenses', 'notices', 'courses'];
 let mongoClient = null;
 let mongoDB = null;

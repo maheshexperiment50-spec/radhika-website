@@ -9,6 +9,7 @@
     "dev": "node server.js"
   },
   "dependencies": {
+    "dotenv": "^18.0.9",
     "express": "^4.19.2",
     "mongodb": "^6.21.0",
     "nodemailer": "^10.2.1"

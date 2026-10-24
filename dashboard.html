@@ -234,11 +234,15 @@
                             <input type="text" id="staffLoginInput" placeholder="e.g. ritasen" required>
                         </div>
                         <div class="form-group">
-                            <label for="staffPassInput">Password</label>
-                            <div style="display: flex; gap: 8px;">
-                                <input type="password" id="staffPassInput" placeholder="Set or change password" style="flex-grow:1;" autocomplete="new-password" required>
-                                <button type="button" class="btn-secondary" id="generatePassBtn" style="padding: 0 10px;" title="Generate Password"><i class="fa-solid fa-key"></i></button>
-                            </div>
+                            <label for="staffEmailInput">Recovery email</label>
+                            <input type="email" id="staffEmailInput" placeholder="name@example.com" maxlength="254" autocomplete="email" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="staffPassInput">Password</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="password" id="staffPassInput" placeholder="Set or change password" style="flex-grow:1;" autocomplete="new-password" required>
+                            <button type="button" class="btn-secondary" id="generatePassBtn" style="padding: 0 10px;" title="Generate Password"><i class="fa-solid fa-key"></i></button>
                         </div>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
