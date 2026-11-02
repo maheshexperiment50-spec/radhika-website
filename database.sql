@@ -85,15 +85,15 @@ CREATE TABLE students (
   address TEXT DEFAULT NULL,
   admission_date DATE NOT NULL,
   fees DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-  original_fee DECIMAL(10,2) DEFAULT NULL,
-  discount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-  discount_reason VARCHAR(255) DEFAULT NULL,
   center_id VARCHAR(50) NOT NULL,
+  created_by VARCHAR(50) DEFAULT NULL,
+  created_by_name VARCHAR(100) DEFAULT NULL,
   status VARCHAR(20) DEFAULT 'active',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_students_center (center_id),
   INDEX idx_students_course (course),
+  INDEX idx_students_created_by (created_by),
   CONSTRAINT fk_students_center FOREIGN KEY (center_id) REFERENCES centers (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -109,6 +109,8 @@ CREATE TABLE fees (
   remark TEXT DEFAULT NULL,
   receipt_no VARCHAR(50) DEFAULT NULL,
   collected_by VARCHAR(50) DEFAULT NULL,
+  collected_by_name VARCHAR(100) DEFAULT NULL,
+  collected_by_role VARCHAR(50) DEFAULT NULL,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   INDEX idx_fees_student (student_id),
   INDEX idx_fees_date (payment_date),
@@ -220,35 +222,35 @@ INSERT INTO staff (id, name, login_id, password, role, center_id, phone, email, 
 ('S008', 'Archana Singh (Branch Head)', 'centerhead3', '123', 'center_admin', 'C004', '9450123456', 'archana@radhikaitcollege.com', 'Center Director - East Branch', 'active');
 
 -- Students
-INSERT INTO students (id, student_name, father_name, mother_name, course, mobile, email, address, admission_date, fees, center_id, status) VALUES
-('RAD-2026-001', 'Aditya Narayan', 'Surendra Prasad', 'Kavita Devi', 'ADCA', '9565123456', 'aditya.n@gmail.com', 'Gola Bazaar, Ward No 4, Gorakhpur', '2026-01-10', 15000, 'C001', 'active'),
-('RAD-2026-002', 'Priya Singh', 'Ramesh Singh', 'Anita Singh', 'DCA', '9988776655', 'priyasingh99@gmail.com', 'Rampuri Colony, Lane 3, Gorakhpur', '2026-02-15', 8000, 'C001', 'active'),
-('RAD-2026-003', 'Vikram Malhotra', 'K. P. Malhotra', 'Sunita Malhotra', 'PGDCA', '9123456789', 'vikram.m@outlook.com', 'Civil Lines Area, Near Park, Gorakhpur', '2026-03-05', 18000, 'C002', 'active'),
-('RAD-2026-004', 'Neha Gupta', 'M. L. Gupta', 'Reena Gupta', 'CCC', '9839401234', 'neha.gupta2026@gmail.com', 'Shastri Nagar, House 14, Gorakhpur', '2026-04-01', 3500, 'C002', 'active'),
-('RAD-2026-005', 'Sandeep Yadav', 'Ram Chandra Yadav', 'Shanti Devi', 'O-Level', '7309876543', 'sandeep.yadav@gmail.com', 'Village Pipra, Post Harra, Sahjanwa', '2026-01-22', 12000, 'C003', 'active'),
-('RAD-2026-006', 'Komal Preet Kaur', 'Gurmukh Singh', 'Harpreet Kaur', 'ADCA', '8127394850', 'komalpreet@gmail.com', 'Model Town Ext, Sector 2, Sahjanwa', '2026-04-20', 15000, 'C003', 'active'),
-('RAD-2026-007', 'Rahul Verma', 'Satya Prakash Verma', 'Maya Verma', 'PGDCA', '9450392817', 'rahul.verma@gmail.com', 'Station Road, Gali 2, Gorakhpur', '2026-02-18', 18000, 'C002', 'completed'),
-('RAD-2026-008', 'Sneha Tiwari', 'J. P. Tiwari', 'Geeta Tiwari', 'DCA', '9670394857', 'sneha.tiwari@gmail.com', 'Vikas Nagar Sector A, House 88', '2026-05-02', 8000, 'C001', 'active'),
-('RAD-2026-009', 'Amitabh Dubey', 'Dinesh Dubey', 'Sushila Dubey', 'BA', '9335678901', 'amitabh.dubey@gmail.com', 'Betiahata, Near Hanuman Mandir', '2026-05-15', 6500, 'C001', 'active'),
-('RAD-2026-010', 'Anjali Maurya', 'Rajendra Maurya', 'Kamla Maurya', 'PY-FS', '9140223344', 'anjali.m@gmail.com', 'Medical Enclave, Gorakhpur', '2026-06-01', 16000, 'C004', 'active'),
-('RAD-2026-011', 'Mohd Faisal', 'Abdul Kalam', 'Naseem Bano', 'ADCA', '9889445566', 'faisal.it@gmail.com', 'Turab Nagar, Mohaddipur', '2026-06-05', 15000, 'C002', 'active'),
-('RAD-2026-012', 'Roshni Prajapati', 'Subhash Prajapati', 'Malti Devi', 'CCC', '7890123456', 'roshni.p@gmail.com', 'Bichhiya, Campierganj Road', '2026-06-12', 3500, 'C003', 'active');
+INSERT INTO students (id, student_name, father_name, mother_name, course, mobile, email, address, admission_date, fees, center_id, created_by, created_by_name, status) VALUES
+('RAD-2026-001', 'Aditya Narayan', 'Surendra Prasad', 'Kavita Devi', 'ADCA', '9565123456', 'aditya.n@gmail.com', 'Gola Bazaar, Ward No 4, Gorakhpur', '2026-01-10', 15000, 'C001', 'S004', 'Rita Sen (Senior Counselor)', 'active'),
+('RAD-2026-002', 'Priya Singh', 'Ramesh Singh', 'Anita Singh', 'DCA', '9988776655', 'priyasingh99@gmail.com', 'Rampuri Colony, Lane 3, Gorakhpur', '2026-02-15', 8000, 'C001', 'S004', 'Rita Sen (Senior Counselor)', 'active'),
+('RAD-2026-003', 'Vikram Malhotra', 'K. P. Malhotra', 'Sunita Malhotra', 'PGDCA', '9123456789', 'vikram.m@outlook.com', 'Civil Lines Area, Near Park, Gorakhpur', '2026-03-05', 18000, 'C002', 'S005', 'Rajesh Kumar (Office Assistant)', 'active'),
+('RAD-2026-004', 'Neha Gupta', 'M. L. Gupta', 'Reena Gupta', 'CCC', '9839401234', 'neha.gupta2026@gmail.com', 'Shastri Nagar, House 14, Gorakhpur', '2026-04-01', 3500, 'C002', 'S005', 'Rajesh Kumar (Office Assistant)', 'active'),
+('RAD-2026-005', 'Sandeep Yadav', 'Ram Chandra Yadav', 'Shanti Devi', 'O-Level', '7309876543', 'sandeep.yadav@gmail.com', 'Village Pipra, Post Harra, Sahjanwa', '2026-01-22', 12000, 'C003', 'S006', 'Sunita Verma (System Operator)', 'active'),
+('RAD-2026-006', 'Komal Preet Kaur', 'Gurmukh Singh', 'Harpreet Kaur', 'ADCA', '8127394850', 'komalpreet@gmail.com', 'Model Town Ext, Sector 2, Sahjanwa', '2026-04-20', 15000, 'C003', 'S006', 'Sunita Verma (System Operator)', 'active'),
+('RAD-2026-007', 'Rahul Verma', 'Satya Prakash Verma', 'Maya Verma', 'PGDCA', '9450392817', 'rahul.verma@gmail.com', 'Station Road, Gali 2, Gorakhpur', '2026-02-18', 18000, 'C002', 'S002', 'Vinay Mishra (Center Head)', 'completed'),
+('RAD-2026-008', 'Sneha Tiwari', 'J. P. Tiwari', 'Geeta Tiwari', 'DCA', '9670394857', 'sneha.tiwari@gmail.com', 'Vikas Nagar Sector A, House 88', '2026-05-02', 8000, 'C001', 'S001', 'Super Administrator', 'active'),
+('RAD-2026-009', 'Amitabh Dubey', 'Dinesh Dubey', 'Sushila Dubey', 'BA', '9335678901', 'amitabh.dubey@gmail.com', 'Betiahata, Near Hanuman Mandir', '2026-05-15', 6500, 'C001', 'S007', 'Pooja Tiwari (Faculty)', 'active'),
+('RAD-2026-010', 'Anjali Maurya', 'Rajendra Maurya', 'Kamla Maurya', 'PY-FS', '9140223344', 'anjali.m@gmail.com', 'Medical Enclave, Gorakhpur', '2026-06-01', 16000, 'C004', 'S008', 'Archana Singh (Branch Head)', 'active'),
+('RAD-2026-011', 'Mohd Faisal', 'Abdul Kalam', 'Naseem Bano', 'ADCA', '9889445566', 'faisal.it@gmail.com', 'Turab Nagar, Mohaddipur', '2026-06-05', 15000, 'C002', 'S005', 'Rajesh Kumar (Office Assistant)', 'active'),
+('RAD-2026-012', 'Roshni Prajapati', 'Subhash Prajapati', 'Malti Devi', 'CCC', '7890123456', 'roshni.p@gmail.com', 'Bichhiya, Campierganj Road', '2026-06-12', 3500, 'C003', 'S006', 'Sunita Verma (System Operator)', 'active');
 
 -- Fees
-INSERT INTO fees (id, student_id, amount, payment_date, payment_mode, remark, receipt_no) VALUES
-('INV-10001', 'RAD-2026-001', 5000, '2026-01-10', 'Cash', 'Admission installment', 'RCP-2026-001'),
-('INV-10002', 'RAD-2026-001', 5000, '2026-03-15', 'UPI', 'Second installment (PhonePe Ref #8892)', 'RCP-2026-002'),
-('INV-10003', 'RAD-2026-002', 4000, '2026-02-15', 'Card', '50% fees payment via POS machine', 'RCP-2026-003'),
-('INV-10004', 'RAD-2026-003', 10000, '2026-03-05', 'UPI', 'Admission payment (GPay Ref #4412)', 'RCP-2026-004'),
-('INV-10005', 'RAD-2026-004', 3500, '2026-04-01', 'Cash', 'Full fees paid at counter', 'RCP-2026-005'),
-('INV-10006', 'RAD-2026-005', 6000, '2026-01-22', 'UPI', 'First installment paid online', 'RCP-2026-006'),
-('INV-10007', 'RAD-2026-006', 7500, '2026-04-20', 'Cash', '50% course fee installment', 'RCP-2026-007'),
-('INV-10008', 'RAD-2026-007', 18000, '2026-02-18', 'UPI', 'Full fees paid - Certificate issued', 'RCP-2026-008'),
-('INV-10009', 'RAD-2026-008', 8000, '2026-05-02', 'Cash', 'Full fees one-time payment with discount', 'RCP-2026-009'),
-('INV-10010', 'RAD-2026-009', 3500, '2026-05-15', 'UPI', 'First installment of Basic Accounting', 'RCP-2026-010'),
-('INV-10011', 'RAD-2026-010', 8000, '2026-06-01', 'Net Banking', 'Admission fee for Python Full Stack', 'RCP-2026-011'),
-('INV-10012', 'RAD-2026-011', 5000, '2026-06-05', 'Cash', 'Initial admission fee', 'RCP-2026-012'),
-('INV-10013', 'RAD-2026-012', 3500, '2026-06-12', 'UPI', 'CCC full course fees paid', 'RCP-2026-013');
+INSERT INTO fees (id, student_id, amount, payment_date, payment_mode, remark, receipt_no, collected_by, collected_by_name, collected_by_role) VALUES
+('INV-10001', 'RAD-2026-001', 5000, '2026-01-10', 'Cash', 'Admission installment', 'RCP-2026-001', 'S004', 'Rita Sen (Senior Counselor)', 'staff'),
+('INV-10002', 'RAD-2026-001', 5000, '2026-03-15', 'UPI', 'Second installment (PhonePe Ref #8892)', 'RCP-2026-002', 'S004', 'Rita Sen (Senior Counselor)', 'staff'),
+('INV-10003', 'RAD-2026-002', 4000, '2026-02-15', 'Card', '50% fees payment via POS machine', 'RCP-2026-003', 'S004', 'Rita Sen (Senior Counselor)', 'staff'),
+('INV-10004', 'RAD-2026-003', 10000, '2026-03-05', 'UPI', 'Admission payment (GPay Ref #4412)', 'RCP-2026-004', 'S005', 'Rajesh Kumar (Office Assistant)', 'staff'),
+('INV-10005', 'RAD-2026-004', 3500, '2026-04-01', 'Cash', 'Full fees paid at counter', 'RCP-2026-005', 'S005', 'Rajesh Kumar (Office Assistant)', 'staff'),
+('INV-10006', 'RAD-2026-005', 6000, '2026-01-22', 'UPI', 'First installment paid online', 'RCP-2026-006', 'S006', 'Sunita Verma (System Operator)', 'staff'),
+('INV-10007', 'RAD-2026-006', 7500, '2026-04-20', 'Cash', '50% course fee installment', 'RCP-2026-007', 'S006', 'Sunita Verma (System Operator)', 'staff'),
+('INV-10008', 'RAD-2026-007', 18000, '2026-02-18', 'UPI', 'Full fees paid - Certificate issued', 'RCP-2026-008', 'S002', 'Vinay Mishra (Center Head)', 'center_admin'),
+('INV-10009', 'RAD-2026-008', 8000, '2026-05-02', 'Cash', 'Full fees one-time payment with discount', 'RCP-2026-009', 'S001', 'Super Administrator', 'super_admin'),
+('INV-10010', 'RAD-2026-009', 3500, '2026-05-15', 'UPI', 'First installment of Basic Accounting', 'RCP-2026-010', 'S007', 'Pooja Tiwari (Faculty)', 'staff'),
+('INV-10011', 'RAD-2026-010', 8000, '2026-06-01', 'Net Banking', 'Admission fee for Python Full Stack', 'RCP-2026-011', 'S008', 'Archana Singh (Branch Head)', 'center_admin'),
+('INV-10012', 'RAD-2026-011', 5000, '2026-06-05', 'Cash', 'Initial admission fee', 'RCP-2026-012', 'S005', 'Rajesh Kumar (Office Assistant)', 'staff'),
+('INV-10013', 'RAD-2026-012', 3500, '2026-06-12', 'UPI', 'CCC full course fees paid', 'RCP-2026-013', 'S006', 'Sunita Verma (System Operator)', 'staff');
 
 -- Expenses
 INSERT INTO expenses (id, center_id, title, amount, date, category, payment_mode, bill_no) VALUES
