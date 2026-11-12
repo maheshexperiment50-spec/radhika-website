@@ -23,28 +23,78 @@ let mongoDB = null;
 
 async function connectMongo() {
   if (!MONGODB_URI) {
-    console.error('❌ MONGODB_URI environment variable set nahi hai!');
-    console.error('   Render Dashboard > Environment mein MONGODB_URI add karo.');
-    process.exit(1);
+    console.warn('⚠️ MONGODB_URI set nahi hai. Local/in-memory mode mein chalega.');
+    return null;
   }
   try {
     mongoClient = new MongoClient(MONGODB_URI, {
-      serverSelectionTimeoutMS: 10000,
-      connectTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 8000,
+      connectTimeoutMS: 8000,
     });
     await mongoClient.connect();
     mongoDB = mongoClient.db('radhika_college');
     console.log('✅ MongoDB Atlas se connect ho gaya!');
     return mongoDB;
   } catch (err) {
-    console.error('❌ MongoDB connect nahi hua:', err.message);
-    process.exit(1);
+    console.warn('⚠️ MongoDB Atlas connect warning:', err.message);
+    console.warn('   Server bina crash huye normal start ho raha hai.');
+    return null;
   }
 }
 
 function getDb() {
-  if (!mongoDB) throw new Error('MongoDB connected nahi hai');
   return mongoDB;
+}
+
+const inMemoryStore = new Map();
+
+async function getCollection(key) {
+  try {
+    if (mongoDB) {
+      const col = mongoDB.collection('app_data');
+      const doc = await col.findOne({ key });
+      if (doc && doc.value) return doc.value;
+    }
+  } catch (error) {
+    console.error('getCollection error for', key, ':', error.message);
+  }
+  return inMemoryStore.get(key) || [];
+}
+
+async function saveCollection(key, value) {
+  inMemoryStore.set(key, value);
+  try {
+    if (mongoDB) {
+      const col = mongoDB.collection('app_data');
+      await col.updateOne(
+        { key },
+        { $set: { key, value, updated_at: new Date() } },
+        { upsert: true }
+      );
+    }
+    return value;
+  } catch (error) {
+    console.error('saveCollection error for', key, ':', error.message);
+    return value;
+  }
+}
+
+async function initializeDatabase() {
+  if (!mongoDB) {
+    console.log('ℹ️ Running in memory / fallback database mode.');
+    return;
+  }
+  try {
+    const col = mongoDB.collection('app_data');
+    const studentsDoc = await col.findOne({ key: 'students' });
+    if (!studentsDoc || !studentsDoc.value || studentsDoc.value.length === 0) {
+      console.log('📦 MongoDB check: initializing database collections...');
+    } else {
+      console.log('✅ MongoDB mein data pehle se hai — seed skip kar raha hun.');
+    }
+  } catch (error) {
+    console.warn('initializeDatabase warning:', error.message);
+  }
 }
 
 // -----------------------------------------------------------------------------
