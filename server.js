@@ -232,22 +232,35 @@ app.post('/api/login', async (req, res) => {
 const serverOtpCache = new Map();
 
 async function sendOtpEmail(toEmail, otpCode, staffName) {
-  const user = process.env.EMAIL_USER || process.env.SMTP_EMAIL;
-  const pass = process.env.EMAIL_PASS || process.env.SMTP_PASSWORD;
+  const host = process.env.SMTP_HOST;
+  const port = parseInt(process.env.SMTP_PORT) || 465;
+  const secure = process.env.SMTP_SECURE === 'true' || port === 465;
+  const user = process.env.SMTP_USER || process.env.EMAIL_USER || process.env.SMTP_EMAIL || process.env.SMTP_FROM;
+  const pass = process.env.SMTP_PASS || process.env.EMAIL_PASS || process.env.SMTP_PASSWORD;
+  const fromEmail = process.env.SMTP_FROM || user;
 
   if (!nodemailer || !user || !pass) {
-    console.log(`📧 [EMAIL NOTICE] Real Gmail sender credentials not set in .env (EMAIL_USER / EMAIL_PASS). OTP for ${toEmail}: ${otpCode}`);
+    console.log(`📧 [EMAIL NOTICE] SMTP credentials missing in environment. Configured: user=${!!user}, pass=${!!pass}`);
     return { sent: false, reason: 'CREDENTIALS_MISSING' };
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user, pass }
-    });
+    const transportConfig = host
+      ? {
+          host,
+          port,
+          secure,
+          auth: { user, pass }
+        }
+      : {
+          service: 'gmail',
+          auth: { user, pass }
+        };
+
+    const transporter = nodemailer.createTransport(transportConfig);
 
     const info = await transporter.sendMail({
-      from: `"Radhika IT College" <${user}>`,
+      from: `"Radhika IT College" <${fromEmail}>`,
       to: toEmail,
       subject: `🔐 Your Login OTP Code: ${otpCode} - Radhika IT College`,
       text: `Namaste ${staffName},\n\nAapka Radhika IT College login verification code hai: ${otpCode}\nYeh code 5 minute ke liye valid hai.\n\nKisi ke sath apna OTP code share na karein.`,
