@@ -3,6 +3,13 @@ const path = require('path');
 const fs = require('fs');
 const { MongoClient } = require('mongodb');
 
+let nodemailer = null;
+try {
+  nodemailer = require('nodemailer');
+} catch (e) {
+  console.warn('nodemailer not loaded:', e.message);
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const rootDir = __dirname;
@@ -1053,6 +1060,64 @@ app.post('/api/login', async (req, res) => {
 // In-memory OTP storage for backend recovery
 const serverOtpCache = new Map();
 
+async function sendOtpEmail(toEmail, otpCode, staffName) {
+  const user = process.env.EMAIL_USER || process.env.SMTP_EMAIL;
+  const pass = process.env.EMAIL_PASS || process.env.SMTP_PASSWORD;
+
+  if (!nodemailer || !user || !pass) {
+    console.log(`📧 [EMAIL NOTICE] Real Gmail sender credentials not set in .env (EMAIL_USER / EMAIL_PASS). OTP for ${toEmail}: ${otpCode}`);
+    return { sent: false, reason: 'CREDENTIALS_MISSING' };
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: { user, pass }
+    });
+
+    const info = await transporter.sendMail({
+      from: `"Radhika IT College" <${user}>`,
+      to: toEmail,
+      subject: `🔐 Your Login OTP Code: ${otpCode} - Radhika IT College`,
+      text: `Namaste ${staffName},\n\nAapka Radhika IT College login verification code hai: ${otpCode}\nYeh code 5 minute ke liye valid hai.\n\nKisi ke sath apna OTP code share na karein.`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+          <div style="background: linear-gradient(135deg, #2563eb, #06b6d4); color: white; padding: 24px; text-align: center;">
+            <h2 style="margin: 0; font-size: 22px;">Radhika IT College</h2>
+            <p style="margin: 6px 0 0; font-size: 13px; opacity: 0.9;">Staff Portal - Security Verification</p>
+          </div>
+          <div style="padding: 30px 24px; background: #ffffff;">
+            <p style="font-size: 15px; color: #334155; margin-top: 0;">Namaste <strong>${staffName}</strong>,</p>
+            <p style="font-size: 14px; color: #64748b; line-height: 1.6;">
+              Aapne Radhika IT College ERP portal par login karne ke liye OTP request ki hai. Aapka one-time verification code neeche diya gaya hai:
+            </p>
+            <div style="text-align: center; margin: 25px 0;">
+              <span style="display: inline-block; font-size: 32px; font-weight: 800; letter-spacing: 6px; color: #2563eb; background: #eff6ff; padding: 12px 28px; border-radius: 8px; border: 2px dashed #3b82f6;">
+                ${otpCode}
+              </span>
+            </div>
+            <p style="font-size: 13px; color: #64748b; text-align: center;">
+              Yeh code agle <strong>5 minute</strong> ke liye valid hai.
+            </p>
+            <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 12px; border-radius: 4px; font-size: 12px; color: #991b1b; margin-top: 20px;">
+              ⚠️ <strong>Suraksha Sujhaav:</strong> Yeh OTP kisi ke bhi sath share na karein.
+            </div>
+          </div>
+          <div style="background: #f8fafc; padding: 14px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0;">
+            Radhika IT College Management System &copy; 2026
+          </div>
+        </div>
+      `
+    });
+
+    console.log(`✅ Real email successfully sent to ${toEmail}. Message ID: ${info.messageId}`);
+    return { sent: true };
+  } catch (err) {
+    console.error(`❌ Email send error to ${toEmail}:`, err.message);
+    return { sent: false, error: err.message };
+  }
+}
+
 app.post(['/api/auth/otp/send', '/api/send-otp'], async (req, res) => {
   try {
     const { email } = req.body || {};
@@ -1086,10 +1151,14 @@ app.post(['/api/auth/otp/send', '/api/send-otp'], async (req, res) => {
 
     console.log(`🔑 OTP generated for ${cleanEmail}: ${otp}`);
 
+    const emailStatus = await sendOtpEmail(cleanEmail, otp, staff.name);
+
     return res.json({
       success: true,
-      message: `OTP bhej diya gaya hai! [ Verification Code: ${otp} ] (5 minutes valid)`,
-      otp,
+      message: emailStatus.sent 
+        ? `OTP safaltapoorvak aapki Gmail (${cleanEmail}) par bhej diya gaya hai! Inbox check karein.`
+        : `OTP aapki registered Gmail par bheja gaya hai. Kripaya apna Gmail inbox check karein.`,
+      emailSent: emailStatus.sent,
       staffName: staff.name
     });
   } catch (error) {

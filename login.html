@@ -204,10 +204,16 @@
                         otpStep1.style.display = 'none';
                         otpStep2.style.display = 'block';
                         const banner = document.getElementById('otpBanner');
-                        if (banner && result.otp) {
-                            banner.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i> <strong>OTP Code:</strong> <span style="font-size:1.2rem; font-weight:800; color:var(--primary); letter-spacing:3px;">${result.otp}</span><br><span style="color:var(--text-secondary); font-size:0.8rem;">(Inbox/Spam check karein ya upar diya OTP code daalein. 5 minutes valid hai)</span>`;
+                        if (banner) {
+                            banner.innerHTML = `<div style="display:flex; align-items:center; gap:10px;">
+                                <i class="fa-solid fa-envelope-circle-check" style="font-size:1.5rem; color:var(--success);"></i>
+                                <div>
+                                    <strong style="color:var(--success);">OTP Online Gmail par bhej diya gaya hai!</strong><br>
+                                    <span style="font-size:0.82rem; color:var(--text-secondary);">6-digit code <strong>${escapeHTML(gmail)}</strong> ke inbox/spam mein dekhein aur neeche enter karein.</span>
+                                </div>
+                            </div>`;
                             const codeInput = document.getElementById('otpCodeInput');
-                            if (codeInput) { codeInput.value = result.otp; }
+                            if (codeInput) { codeInput.value = ''; codeInput.focus(); }
                         }
                     } finally {
                         sendOtpBtn.disabled = false;
