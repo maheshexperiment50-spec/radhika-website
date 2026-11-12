@@ -200,6 +200,7 @@ const SEED = {
       center_id: '',
       phone: '9876543200',
       email: 'admin@radhikaitcollege.com',
+      gmail: 'maheshexperiment50@gmail.com',
       designation: 'Managing Director / Super Admin',
       status: 'active'
     },
@@ -1046,6 +1047,96 @@ app.post('/api/login', async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ success: false, message: 'Authentication failed due to server error.' });
+  }
+});
+
+// In-memory OTP storage for backend recovery
+const serverOtpCache = new Map();
+
+app.post(['/api/auth/otp/send', '/api/send-otp'], async (req, res) => {
+  try {
+    const { email } = req.body || {};
+    if (!email) {
+      return res.status(400).json({ success: false, message: 'Gmail address required hai.' });
+    }
+    const cleanEmail = String(email).trim().toLowerCase();
+    const staffList = await getCollection('staff');
+    const staff = staffList.find(s => s.gmail && s.gmail.trim().toLowerCase() === cleanEmail);
+
+    if (!staff || !staff.gmail) {
+      return res.status(404).json({
+        success: false,
+        message: 'Yeh Gmail kisi staff account se registered nahi hai ya Super Admin ne remove kar di hai. Kripaya Super Admin se sampark karein.'
+      });
+    }
+
+    if (staff.status !== 'active') {
+      return res.status(403).json({
+        success: false,
+        message: 'Aapka account inactive hai. Super Admin se sampark karein.'
+      });
+    }
+
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    serverOtpCache.set(cleanEmail, {
+      otp,
+      expiresAt: Date.now() + 5 * 60 * 1000,
+      staffId: staff.id
+    });
+
+    console.log(`🔑 OTP generated for ${cleanEmail}: ${otp}`);
+
+    return res.json({
+      success: true,
+      message: `OTP bhej diya gaya hai! [ Verification Code: ${otp} ] (5 minutes valid)`,
+      otp,
+      staffName: staff.name
+    });
+  } catch (error) {
+    console.error('OTP Send error:', error);
+    res.status(500).json({ success: false, message: 'OTP send failed due to server error.' });
+  }
+});
+
+app.post(['/api/auth/otp/verify', '/api/verify-otp'], async (req, res) => {
+  try {
+    const { email, otp } = req.body || {};
+    if (!email || !otp) {
+      return res.status(400).json({ success: false, message: 'Gmail aur OTP dono required hain.' });
+    }
+    const cleanEmail = String(email).trim().toLowerCase();
+    const cached = serverOtpCache.get(cleanEmail);
+
+    if (!cached) {
+      return res.status(400).json({ success: false, message: 'OTP nahi mila. Pehle "OTP Bhejein" par click karein.' });
+    }
+
+    if (Date.now() > cached.expiresAt) {
+      serverOtpCache.delete(cleanEmail);
+      return res.status(400).json({ success: false, message: 'OTP expire ho chuka hai. Kripaya naya OTP mangwayein.' });
+    }
+
+    if (cached.otp !== String(otp).trim()) {
+      return res.status(400).json({ success: false, message: 'Galat OTP code! Kripaya sahi 6-digit OTP daalein.' });
+    }
+
+    const staffList = await getCollection('staff');
+    const staff = staffList.find(s => s.id === cached.staffId && s.gmail && s.gmail.trim().toLowerCase() === cleanEmail);
+
+    if (!staff) {
+      serverOtpCache.delete(cleanEmail);
+      return res.status(404).json({ success: false, message: 'Staff record nahi mila ya Gmail registration remove ho gaya hai.' });
+    }
+
+    if (staff.status !== 'active') {
+      return res.status(403).json({ success: false, message: 'Aapka account inactive hai. Super Admin se sampark karein.' });
+    }
+
+    serverOtpCache.delete(cleanEmail);
+    return res.json({ success: true, user: staff });
+  } catch (error) {
+    console.error('OTP Verify error:', error);
+    res.status(500).json({ success: false, message: 'Verification failed due to server error.' });
   }
 });
 

@@ -50,6 +50,56 @@
         <div style="text-align: center; margin-top: 25px;">
             <a href="index.html" style="font-size: 0.85rem; color: var(--text-secondary);"><i class="fa-solid fa-arrow-left mr-2"></i> Back to Main Website</a>
         </div>
+
+        <!-- OTP Login Section -->
+        <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 20px; text-align: center;">
+            <button type="button" id="toggleOtpBtn" style="background: none; border: none; color: var(--primary); font-size: 0.85rem; cursor: pointer; font-weight: 600; padding: 6px 10px; border-radius: 6px; transition: background 0.2s;">
+                <i class="fa-solid fa-key mr-2"></i> Login ID bhool gaye? OTP se Login karein
+            </button>
+        </div>
+
+        <!-- OTP Form (initially hidden) -->
+        <div id="otpLoginSection" style="display:none; margin-top: 18px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px;">
+            <h4 style="font-size:0.95rem; font-weight:700; color:var(--primary); margin-bottom:14px;"><i class="fa-solid fa-envelope-open-text mr-2"></i> OTP ke Zariye Login Karein</h4>
+            
+            <!-- Step 1: Gmail Input -->
+            <div id="otpStep1">
+                <div class="form-group">
+                    <label for="otpGmailInput">Registered Gmail Address</label>
+                    <div style="position: relative;">
+                        <i class="fa-regular fa-envelope" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                        <input type="email" id="otpGmailInput" placeholder="yourname@gmail.com" style="padding-left: 35px; width: 100%;" autocomplete="email">
+                    </div>
+                    <small style="color: var(--text-muted); margin-top: 4px; display:block;"><i class="fa-solid fa-circle-info mr-1"></i>Wahi Gmail daalein jo Super Admin ne register ki hai</small>
+                </div>
+                <button type="button" id="sendOtpBtn" class="btn-primary" style="width:100%; padding: 10px;">
+                    <i class="fa-solid fa-paper-plane mr-2"></i> OTP Bhejein
+                </button>
+            </div>
+
+            <!-- Step 2: OTP Verification (initially hidden) -->
+            <div id="otpStep2" style="display:none;">
+                <div id="otpBanner" style="background: rgba(16, 185, 129, 0.08); border: 1px solid var(--success); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px; font-size: 0.85rem; color: var(--success);">
+                    <i class="fa-solid fa-circle-info mr-2"></i> <strong>OTP aapki registered Gmail par bhej diya gaya hai!</strong><br>
+                    <span style="color: var(--text-secondary); font-size: 0.8rem;">Inbox/Spam check karein. OTP 5 minutes ke liye valid hai.</span>
+                </div>
+                <div class="form-group">
+                    <label for="otpCodeInput">6-Digit OTP Code Daalein</label>
+                    <div style="position: relative;">
+                        <i class="fa-solid fa-shield-halved" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                        <input type="text" id="otpCodeInput" placeholder="e.g. 123456" maxlength="6" style="padding-left: 35px; width: 100%; letter-spacing: 4px; font-size: 1.2rem; font-weight: 700;" autocomplete="one-time-code">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" id="verifyOtpBtn" class="btn-primary" style="flex: 1; padding: 10px;">
+                        <i class="fa-solid fa-right-to-bracket mr-2"></i> Verify & Login
+                    </button>
+                    <button type="button" id="resendOtpBtn" class="btn-secondary" style="padding: 10px 14px;" title="Resend OTP">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Toast Notifications Container -->
@@ -115,6 +165,91 @@
                     setTimeout(() => { toast.remove(); }, 300);
                 }, 4000);
             }
+
+            // OTP Login Logic
+            let otpGmailForLogin = '';
+            const toggleOtpBtn = document.getElementById('toggleOtpBtn');
+            const otpLoginSection = document.getElementById('otpLoginSection');
+            const otpStep1 = document.getElementById('otpStep1');
+            const otpStep2 = document.getElementById('otpStep2');
+
+            if (toggleOtpBtn) {
+                toggleOtpBtn.addEventListener('click', () => {
+                    const isHidden = otpLoginSection.style.display === 'none';
+                    otpLoginSection.style.display = isHidden ? 'block' : 'none';
+                    toggleOtpBtn.innerHTML = isHidden
+                        ? '<i class="fa-solid fa-xmark mr-2"></i> OTP Login band karein'
+                        : '<i class="fa-solid fa-key mr-2"></i> Login ID bhool gaye? OTP se Login karein';
+                });
+            }
+
+            function showOtpSendUI() {
+                const sendOtpBtn = document.getElementById('sendOtpBtn');
+                if (!sendOtpBtn) return;
+                sendOtpBtn.addEventListener('click', async () => {
+                    const gmail = document.getElementById('otpGmailInput').value.trim();
+                    if (!gmail) {
+                        showToast('Kripaya apni registered Gmail address daalein.', 'warning');
+                        return;
+                    }
+                    sendOtpBtn.disabled = true;
+                    try {
+                        const result = await DB.sendLoginOtp(gmail);
+                        if (!result.success) {
+                            showToast(result.message, 'danger');
+                            return;
+                        }
+                        otpGmailForLogin = gmail;
+                        showToast(result.message, 'success');
+                        otpStep1.style.display = 'none';
+                        otpStep2.style.display = 'block';
+                        const banner = document.getElementById('otpBanner');
+                        if (banner && result.otp) {
+                            banner.innerHTML = `<i class="fa-solid fa-circle-check mr-2"></i> <strong>OTP Code:</strong> <span style="font-size:1.2rem; font-weight:800; color:var(--primary); letter-spacing:3px;">${result.otp}</span><br><span style="color:var(--text-secondary); font-size:0.8rem;">(Inbox/Spam check karein ya upar diya OTP code daalein. 5 minutes valid hai)</span>`;
+                            const codeInput = document.getElementById('otpCodeInput');
+                            if (codeInput) { codeInput.value = result.otp; }
+                        }
+                    } finally {
+                        sendOtpBtn.disabled = false;
+                    }
+                });
+            }
+
+            function showOtpVerifyUI() {
+                const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+                const resendOtpBtn = document.getElementById('resendOtpBtn');
+
+                if (verifyOtpBtn) {
+                    verifyOtpBtn.addEventListener('click', async () => {
+                        const otp = document.getElementById('otpCodeInput').value.trim();
+                        if (!otp || otp.length !== 6) {
+                            showToast('Kripaya 6-digit OTP daalein.', 'warning');
+                            return;
+                        }
+                        verifyOtpBtn.disabled = true;
+                        const result = await DB.loginWithOtp(otpGmailForLogin, otp);
+                        if (result.success) {
+                            showToast(`Welcome ${result.user.name}! OTP se login ho gaye. Redirect ho raha hai...`, 'success');
+                            setTimeout(() => { window.location.href = 'dashboard.html'; }, 1200);
+                        } else {
+                            showToast(result.message, 'danger');
+                        }
+                        verifyOtpBtn.disabled = false;
+                    });
+                }
+
+                if (resendOtpBtn) {
+                    resendOtpBtn.addEventListener('click', () => {
+                        otpStep1.style.display = 'block';
+                        otpStep2.style.display = 'none';
+                        document.getElementById('otpCodeInput').value = '';
+                        showToast('OTP form reset ho gaya. Dobara bhejein.', 'info');
+                    });
+                }
+            }
+
+            showOtpSendUI();
+            showOtpVerifyUI();
         });
     </script>
 </body>

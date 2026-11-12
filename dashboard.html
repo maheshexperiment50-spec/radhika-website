@@ -257,6 +257,13 @@
                             </select>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="staffGmailInput"><i class="fa-solid fa-envelope mr-1 text-primary"></i> Registered Staff Gmail (OTP Login ke liye)</label>
+                        <input type="email" id="staffGmailInput" placeholder="e.g. staff@gmail.com" autocomplete="email">
+                        <small style="color:var(--text-muted); font-size:0.75rem;">
+                            <i class="fa-solid fa-shield-halved text-warning mr-1"></i>Sirf Super Admin hi Gmail register ya remove kar sakta hai. Yahan se Gmail hatane par OTP nahi jayega.
+                        </small>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-secondary close-modal">Cancel</button>
@@ -312,6 +319,12 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="studentAdmissionDateInput"><i class="fa-solid fa-calendar mr-1 text-primary"></i> Admission Date (सत्र / वर्ष)</label>
+                            <input type="date" id="studentAdmissionDateInput" required>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
                             <label for="studentStatusInput">Enrollment Status</label>
                             <select id="studentStatusInput" required>
                                 <option value="active">Active</option>
@@ -319,10 +332,10 @@
                                 <option value="dropped">Dropped</option>
                             </select>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="studentAddressInput">Postal Address</label>
-                        <input type="text" id="studentAddressInput" placeholder="Village/City, Ward, District" required>
+                        <div class="form-group">
+                            <label for="studentAddressInput">Postal Address</label>
+                            <input type="text" id="studentAddressInput" placeholder="Village/City, Ward, District" required>
+                        </div>
                     </div>
                     <!-- Discount Row -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -380,6 +393,10 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label for="feePaymentDateInput"><i class="fa-solid fa-calendar mr-1 text-primary"></i> Payment Date</label>
+                        <input type="date" id="feePaymentDateInput" required>
+                    </div>
+                    <div class="form-group">
                         <label for="feeRemarkInput">Transaction Remarks</label>
                         <input type="text" id="feeRemarkInput" placeholder="e.g. 2nd Installment, Final clear" value="Installment submission">
                     </div>
@@ -417,15 +434,21 @@
                                 <option value="Rent">Campus Rent</option>
                                 <option value="Office Supplies">Office Supplies & Stationery</option>
                                 <option value="Salary">Staff Salary Disbursal</option>
-                                <option value="Others">Lab Maintenance / Miscellaneous</option>
+                                <option value="Others">Others</option>
                             </select>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="expenseCenterInput">Chargeable Branch Center</label>
-                        <select id="expenseCenterInput" required>
-                            <!-- Populated dynamically -->
-                        </select>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="expenseCenterInput">Chargeable Branch Center</label>
+                            <select id="expenseCenterInput" required>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseDateInput"><i class="fa-solid fa-calendar mr-1 text-primary"></i> Expense Date</label>
+                            <input type="date" id="expenseDateInput" required>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
