@@ -198,7 +198,7 @@
                         </div>
                         <div class="form-group">
                             <label for="courseFeeInput">Course Fee (₹)</label>
-                            <input type="number" id="courseFeeInput" placeholder="5000" min="0" required>
+                            <input type="number" id="courseFeeInput" placeholder="12000" min="0" required>
                         </div>
                     </div>
                     <div class="form-group">
@@ -290,12 +290,13 @@
                         <div class="form-group">
                             <label for="studentCourseInput">Program Course</label>
                             <select id="studentCourseInput" required>
-                                <option value="DCA">DCA</option>
-                                <option value="ADCA">ADCA</option>
-                                <option value="PGDCA">PGDCA</option>
-                                <option value="O-Level">O-Level</option>
-                                <option value="CCC">CCC</option>
-                                <option value="BA">BA</option>
+                                <option value="BA PART 1">BA PART 1 - Bachelor of Arts (1 Year)</option>
+                                <option value="DCA">DCA - Diploma in Computer Applications (6 Months)</option>
+                                <option value="ADCA">ADCA - Advanced Diploma in Computer Applications (12 Months)</option>
+                                <option value="PGDCA">PGDCA - Post Graduate Diploma in Computer Applications (12 Months)</option>
+                                <option value="O-Level">O-Level - NIELIT Certification (12 Months)</option>
+                                <option value="CCC">CCC - Course on Computer Concepts (3 Months)</option>
+                                <option value="BA">BA - Bachelor of Arts Degree (3 Years)</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -333,6 +334,11 @@
                             <label>💰 Final Fees After Discount</label>
                             <input type="text" id="studentFinalFeesDisplay" readonly style="background:var(--bg-secondary); font-weight:700; color:var(--primary);" placeholder="Auto calculated">
                         </div>
+                    </div>
+                    <!-- Fees Lock Warning Banner (Shown for Center Admin when editing an admitted student) -->
+                    <div id="feesLockNotice" style="display:none; background:rgba(245, 158, 11, 0.12); border:1px solid var(--warning); border-radius:var(--radius-sm); padding:10px 14px; margin-top:10px; font-size:0.85rem; color:var(--warning);">
+                        <i class="fa-solid fa-lock mr-2"></i>
+                        <strong>Fees Locked:</strong> Ek baar fees dalne ke baad Center Admin fees ya course edit nahi kar sakta. Fees badalne ke liye sirf <strong>Super Admin</strong> authorized hai.
                     </div>
                 </div>
                 <div class="modal-footer">

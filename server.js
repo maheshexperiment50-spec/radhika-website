@@ -159,6 +159,16 @@ const SEED = {
       status: 'active'
     },
     {
+      id: 'COURSE-009',
+      code: 'BA PART 1',
+      name: 'Bachelor of Arts (Part 1)',
+      duration: '1 Year',
+      fee: 12000,
+      description: 'Bachelor of Arts 1st Year Degree Program.',
+      eligibility: '12th Pass in any stream',
+      status: 'active'
+    },
+    {
       id: 'COURSE-007',
       code: 'PY-FS',
       name: 'Python Full Stack Web Development',
