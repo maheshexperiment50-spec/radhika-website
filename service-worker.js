@@ -1,4 +1,4 @@
-const CACHE_NAME = 'radhika-it-college-v1';
+const CACHE_NAME = 'radhika-it-college-v2';
 const APP_SHELL = [
     '/',
     '/index.html',
