@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radhika IT College | Management System & Portal</title>
     <meta name="description" content="Welcome to Radhika IT College. Explore our professional IT courses, DCA, PGDCA, ADCA, O-Level, and manage college operations seamlessly.">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="images/app-icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/app-icon-192.png">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
@@ -38,6 +42,9 @@
 
         <!-- Mobile Menu Toggle -->
         <div style="display: flex; gap: 10px; align-items: center;">
+            <button class="btn-primary" id="install-app-btn" type="button" style="display: none; padding: 6px 12px; font-size: 0.85rem;" aria-label="Install Radhika IT College app">
+                <i class="fa-solid fa-download" aria-hidden="true"></i> Install
+            </button>
             <button class="theme-btn" id="mobile-theme-toggle" style="display: none;" title="Toggle Theme">
                 <i class="fa-solid fa-moon"></i>
             </button>

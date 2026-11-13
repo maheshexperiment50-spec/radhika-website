@@ -337,12 +337,19 @@ app.post(['/api/auth/otp/send', '/api/send-otp'], async (req, res) => {
 
     const emailStatus = await sendOtpEmail(cleanEmail, otp, staff.name);
 
+    if (!emailStatus.sent) {
+      return res.status(503).json({
+        success: false,
+        message: 'OTP email delivery is not configured on this server. Add SMTP_USER and SMTP_PASS in .env to enable Gmail OTP delivery.',
+        emailSent: false,
+        staffName: staff.name
+      });
+    }
+
     return res.json({
       success: true,
-      message: emailStatus.sent 
-        ? `OTP safaltapoorvak aapki Gmail (${cleanEmail}) par bhej diya gaya hai! Inbox check karein.`
-        : `OTP aapki registered Gmail par bheja gaya hai. Kripaya apna Gmail inbox check karein.`,
-      emailSent: emailStatus.sent,
+      message: `OTP safaltapoorvak aapki Gmail (${cleanEmail}) par bhej diya gaya hai! Inbox check karein.`,
+      emailSent: true,
       staffName: staff.name
     });
   } catch (error) {
