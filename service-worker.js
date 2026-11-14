@@ -1,4 +1,4 @@
-const CACHE_NAME = 'radhika-it-college-v3';
+const CACHE_NAME = 'radhika-it-college-v4';
 const APP_SHELL = [
     '/',
     '/index.html',
@@ -12,9 +12,13 @@ const APP_SHELL = [
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => cache.addAll(APP_SHELL))
-            .then(() => self.skipWaiting())
+        caches.open(CACHE_NAME).then((cache) => {
+            return Promise.allSettled(
+                APP_SHELL.map((url) =>
+                    cache.add(url).catch((err) => console.warn('PWA: Failed to cache', url, err))
+                )
+            );
+        }).then(() => self.skipWaiting())
     );
 });
 
@@ -62,6 +66,8 @@ self.addEventListener('fetch', (event) => {
                     caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseCopy));
                 }
                 return response;
+            }).catch(() => {
+                // Network fail fallback
             });
         })
     );
